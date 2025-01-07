@@ -1,36 +1,44 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, FlatList, StyleSheet } from 'react-native';
+import { Button, Input, Text, FlatList, VStack } from 'native-base';
+import AppLayout from '../../components/AppLayout'; // Caminho correto
 
 export default function PessoasScreen() {
   const [pessoas, setPessoas] = useState([]);
   const [nome, setNome] = useState('');
 
   const adicionarPessoa = () => {
-    setPessoas([...pessoas, { id: Date.now().toString(), nome }]);
-    setNome('');
+    if (nome.trim()) {
+      setPessoas([...pessoas, { id: Date.now().toString(), nome }]);
+      setNome('');
+    }
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Gestão de Pessoas</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Nome"
-        value={nome}
-        onChangeText={setNome}
-      />
-      <Button title="Adicionar Pessoa" onPress={adicionarPessoa} />
-      <FlatList
-        data={pessoas}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => <Text>{item.nome}</Text>}
-      />
-    </View>
+    <AppLayout title="Gerenciar Clientes">
+      <VStack space={5} alignItems="center" flex={1} mt={5}>
+        {/* Input para adicionar pessoa */}
+        <Input
+          placeholder="Nome da Pessoa"
+          value={nome}
+          onChangeText={setNome}
+          width="80%"
+        />
+        
+        {/* Botão para adicionar pessoa */}
+        <Button
+          onPress={adicionarPessoa}
+          width="80%"
+        >
+          Adicionar Pessoa
+        </Button>
+        
+        {/* Lista de pessoas */}
+        <FlatList
+          data={pessoas}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => <Text>{item.nome}</Text>}
+        />
+      </VStack>
+    </AppLayout>
   );
 }
-
-const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20 },
-  title: { fontSize: 24, fontWeight: 'bold', textAlign: 'center', marginBottom: 20 },
-  input: { borderWidth: 1, borderColor: '#ccc', padding: 10, marginBottom: 10, borderRadius: 5 },
-});
