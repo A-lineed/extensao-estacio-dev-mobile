@@ -1,5 +1,5 @@
-import { Box, Button, FlatList, Heading, Input, VStack, Text } from 'native-base';
 import React, { useState } from 'react';
+import { View, Text, TextInput, Button, FlatList, StyleSheet } from 'react-native';
 
 export default function PedidosScreen() {
   const [pedidos, setPedidos] = useState([]);
@@ -11,32 +11,26 @@ export default function PedidosScreen() {
   };
 
   return (
-    <Box flex={1} safeArea bg="primary.50" p={5}>
-      <Heading color="primary.500" fontSize="xl" mb={4}>
-        Gestão de Pedidos
-      </Heading>
-      <VStack space={3}>
-        <Input
-          placeholder="Descrição"
-          value={descricao}
-          onChangeText={setDescricao}
-          variant="filled"
-          bg="white"
-          _focus={{ borderColor: 'primary.500' }}
-        />
-        <Button colorScheme="primary" onPress={adicionarPedido}>
-          Adicionar Pedido
-        </Button>
-        <FlatList
-          data={pedidos}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <Box bg="white" p={3} rounded="md" shadow={1} mb={2}>
-              <Text>{item.descricao}</Text>
-            </Box>
-          )}
-        />
-      </VStack>
-    </Box>
+    <View style={styles.container}>
+      <Text style={styles.title}>Gestão de Pedidos</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Descrição"
+        value={descricao}
+        onChangeText={setDescricao}
+      />
+      <Button title="Adicionar Pedido" onPress={adicionarPedido} />
+      <FlatList
+        data={pedidos}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => <Text>{item.descricao}</Text>}
+      />
+    </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: { flex: 1, padding: 20 },
+  title: { fontSize: 24, fontWeight: 'bold', textAlign: 'center', marginBottom: 20 },
+  input: { borderWidth: 1, borderColor: '#ccc', padding: 10, marginBottom: 10, borderRadius: 5 },
+});
