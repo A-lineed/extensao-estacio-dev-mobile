@@ -76,12 +76,11 @@ export default function ClientesScreen() {
         </Center>
 
         {/* Título */}
-        <Heading color="primary.500" size="lg" mt={5} mb={5}>
+        <Heading color="purple.500" size="lg" mt={5} mb={5}>
           Administração de Clientes
         </Heading>
 
-        {/* Botão para adicionar cliente */}
-        <Button onPress={() => setShowModal(true)} width="50%" mb={5}>
+        <Button onPress={() => setShowModal(true)} colorScheme="purple" width="50%" mb={5}>
           Adicionar Cliente
         </Button>
 
