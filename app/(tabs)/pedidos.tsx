@@ -1,89 +1,114 @@
 import React, { useState } from 'react';
-import { Button, Input, Text, FlatList, VStack, HStack, Box, Center, Heading, Image } from 'native-base';
-import AppLayout from '../../components/AppLayout'; // Caminho correto
+import { Button, Input, Text, FlatList, VStack, HStack, Box, Center, Heading, IconButton, Icon, Modal, Image } from 'native-base';
+import { Ionicons } from '@expo/vector-icons';
+import AppLayout from '../../components/AppLayout';
 
 export default function PedidosScreen() {
   const [pedidos, setPedidos] = useState([]);
+  const [showModal, setShowModal] = useState(false);
   const [nome, setNome] = useState('');
+  const [descricao, setDescricao] = useState('');
   const [quantidade, setQuantidade] = useState('');
   const [prioridade, setPrioridade] = useState('');
-  const [descricao, setDescricao] = useState('');
+  const [dataEntrega, setDataEntrega] = useState('');
+  const [nomeCliente, setNomeCliente] = useState('');
+  const [valorTotal, setValorTotal] = useState('');
+  const [altura, setAltura] = useState('');
+  const [cumprimento, setCumprimento] = useState('');
+  const [editando, setEditando] = useState(null);
 
-  // Função para adicionar um pedido
-  const adicionarPedido = () => {
-    if (nome.trim() && quantidade.trim() && prioridade.trim()) {
+  const adicionarOuEditarPedido = () => {
+    if (
+      nome.trim() &&
+      quantidade.trim() &&
+      prioridade.trim() &&
+      dataEntrega.trim() &&
+      nomeCliente.trim() &&
+      valorTotal.trim() &&
+      altura.trim() &&
+      cumprimento.trim()
+    ) {
       const novoPedido = {
-        id: Date.now().toString(),
+        id: editando ? editando.id : Date.now().toString(),
         nome,
         descricao,
-        quantidade: parseInt(quantidade), // Convertendo para número
+        quantidade: parseInt(quantidade),
         prioridade,
-        dataCriacao: new Date().toLocaleString(), // Data de criação formatada
+        dataEntrega,
+        nomeCliente,
+        valorTotal: `R$ ${parseFloat(valorTotal).toFixed(2)}`,
+        altura: parseFloat(altura),
+        cumprimento: parseFloat(cumprimento),
+        dataCriacao: new Date().toLocaleString(),
       };
 
-      setPedidos([...pedidos, novoPedido]);
-      // Resetando os campos após o envio
+      if (editando) {
+        setPedidos((prevPedidos) =>
+          prevPedidos.map((pedido) =>
+            pedido.id === editando.id ? novoPedido : pedido
+          )
+        );
+        setEditando(null);
+      } else {
+        setPedidos([...pedidos, novoPedido]);
+      }
+
       setNome('');
       setDescricao('');
       setQuantidade('');
       setPrioridade('');
+      setDataEntrega('');
+      setNomeCliente('');
+      setValorTotal('');
+      setAltura('');
+      setCumprimento('');
+      setShowModal(false);
     }
+  };
+
+  const excluirPedido = (id) => {
+    setPedidos((prevPedidos) => prevPedidos.filter((pedido) => pedido.id !== id));
+  };
+
+  const editarPedido = (pedido) => {
+    setEditando(pedido);
+    setNome(pedido.nome);
+    setDescricao(pedido.descricao);
+    setQuantidade(pedido.quantidade.toString());
+    setPrioridade(pedido.prioridade);
+    setDataEntrega(pedido.dataEntrega);
+    setNomeCliente(pedido.nomeCliente);
+    setValorTotal(pedido.valorTotal.replace('R$ ', ''));
+    setAltura(pedido.altura.toString());
+    setCumprimento(pedido.cumprimento.toString());
+    setShowModal(true);
   };
 
   return (
     <AppLayout title="Cadastro de Pedidos">
       <VStack space={5} alignItems="center" flex={1} mt={5}>
-        {/* Logo no centro superior */}
         <Center mt={5}>
           <Image
-            source={require('../../assets/images/logo.jpeg')} // Caminho correto da sua logo
+            source={require('../../assets/images/logo.jpeg')}
             alt="Logo"
             size="lg"
             resizeMode="contain"
           />
         </Center>
 
-        {/* Título "Cadastro de Pedidos" */}
-        <Heading color="primary.500" size="lg" mb={5}>
+        <Heading color="purple.500" size="lg" mb={5}>
           Cadastro de Pedidos
         </Heading>
 
-        {/* Campos de Entrada */}
-        <Input
-          placeholder="Nome do Pedido"
-          value={nome}
-          onChangeText={setNome}
-          width="80%"
-        />
-        <Input
-          placeholder="Descrição do Pedido"
-          value={descricao}
-          onChangeText={setDescricao}
-          width="80%"
-        />
-        <Input
-          placeholder="Quantidade"
-          value={quantidade}
-          onChangeText={setQuantidade}
-          keyboardType="numeric" // Permitindo apenas números
-          width="80%"
-        />
-        <Input
-          placeholder="Prioridade"
-          value={prioridade}
-          onChangeText={setPrioridade}
-          width="80%"
-        />
-        
-        {/* Botão para adicionar pedido */}
         <Button
-          onPress={adicionarPedido}
+          onPress={() => setShowModal(true)}
+          colorScheme="purple"
           width="80%"
+          mb={5}
         >
           Adicionar Pedido
         </Button>
 
-        {/* Lista de pedidos */}
         <FlatList
           data={pedidos}
           keyExtractor={(item) => item.id}
@@ -100,11 +125,100 @@ export default function PedidosScreen() {
               <Text>Descrição: {item.descricao}</Text>
               <Text>Quantidade: {item.quantidade}</Text>
               <Text>Prioridade: {item.prioridade}</Text>
+              <Text>Data de Entrega: {item.dataEntrega}</Text>
+              <Text>Nome do Cliente: {item.nomeCliente}</Text>
+              <Text>Valor Total: {item.valorTotal}</Text>
+              <Text>Altura: {item.altura} m</Text>
+              <Text>Cumprimento: {item.cumprimento} m</Text>
               <Text>Data de Criação: {item.dataCriacao}</Text>
+              <HStack justifyContent="space-between" mt={2}>
+                <IconButton
+                  icon={<Icon as={Ionicons} name="create" size="sm" />}
+                  onPress={() => editarPedido(item)}
+                  colorScheme="blue"
+                  borderRadius="full"
+                />
+                <IconButton
+                  icon={<Icon as={Ionicons} name="trash" size="sm" />}
+                  onPress={() => excluirPedido(item.id)}
+                  colorScheme="red"
+                  borderRadius="full"
+                />
+              </HStack>
             </Box>
           )}
+          ListEmptyComponent={
+            <Text color="gray.500" textAlign="center" mt={5}>
+              Nenhum pedido cadastrado.
+            </Text>
+          }
         />
       </VStack>
+
+      <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
+        <Modal.Content>
+          <Modal.CloseButton />
+          <Modal.Header>{editando ? 'Editar Pedido' : 'Adicionar Pedido'}</Modal.Header>
+          <Modal.Body>
+            <VStack space={3}>
+              <Input
+                placeholder="Nome do Pedido"
+                value={nome}
+                onChangeText={setNome}
+              />
+              <Input
+                placeholder="Descrição do Pedido"
+                value={descricao}
+                onChangeText={setDescricao}
+              />
+              <Input
+                placeholder="Quantidade"
+                value={quantidade}
+                onChangeText={setQuantidade}
+                keyboardType="numeric"
+              />
+              <Input
+                placeholder="Prioridade"
+                value={prioridade}
+                onChangeText={setPrioridade}
+              />
+              <Input
+                placeholder="Data de Entrega"
+                value={dataEntrega}
+                onChangeText={setDataEntrega}
+              />
+              <Input
+                placeholder="Nome do Cliente"
+                value={nomeCliente}
+                onChangeText={setNomeCliente}
+              />
+              <Input
+                placeholder="Valor Total (em R$)"
+                value={valorTotal}
+                onChangeText={setValorTotal}
+                keyboardType="numeric"
+              />
+              <Input
+                placeholder="Altura (m)"
+                value={altura}
+                onChangeText={setAltura}
+                keyboardType="numeric"
+              />
+              <Input
+                placeholder="Cumprimento (m)"
+                value={cumprimento}
+                onChangeText={setCumprimento}
+                keyboardType="numeric"
+              />
+            </VStack>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button onPress={adicionarOuEditarPedido} colorScheme="purple">
+              {editando ? 'Salvar Alterações' : 'Adicionar Pedido'}
+            </Button>
+          </Modal.Footer>
+        </Modal.Content>
+      </Modal>
     </AppLayout>
   );
 }
