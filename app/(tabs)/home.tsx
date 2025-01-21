@@ -71,7 +71,7 @@ export default function HomeScreen() {
               size="lg"
               bg="purple.600"
               _pressed={{ bg: 'purple.700' }}
-              onPress={() => router.push('/tabs/relatorios')}
+              onPress={() => router.push('..//tabs/relatorio')}
               width="80%"
               borderRadius="md"
               shadow={4}
