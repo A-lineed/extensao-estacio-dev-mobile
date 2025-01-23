@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Button, Input, Text, FlatList, VStack, HStack, Box, Center, Heading, IconButton, Icon, Modal, Image } from 'native-base';
+import { Button, Input, Text, FlatList, VStack, HStack, Box, Center, Heading, IconButton, Icon, Modal, Image, Select } from 'native-base';
 import { Ionicons } from '@expo/vector-icons';
+import { TextInputMask } from 'react-native-masked-text'; // Importando o TextInputMask
 import AppLayout from '../../components/AppLayout';
 
 export default function PedidosScreen() {
@@ -18,13 +19,16 @@ export default function PedidosScreen() {
   const [editando, setEditando] = useState(null);
 
   const adicionarOuEditarPedido = () => {
+    // Verifica se o valor total é um número válido
+    const valorTotalNumeric = parseFloat(valorTotal.replace('R$', '').replace(',', '.').trim());
+
     if (
       nome.trim() &&
       quantidade.trim() &&
       prioridade.trim() &&
       dataEntrega.trim() &&
       nomeCliente.trim() &&
-      valorTotal.trim() &&
+      !isNaN(valorTotalNumeric) && // Verifica se o valor total é um número válido
       altura.trim() &&
       cumprimento.trim()
     ) {
@@ -36,7 +40,7 @@ export default function PedidosScreen() {
         prioridade,
         dataEntrega,
         nomeCliente,
-        valorTotal: `R$ ${parseFloat(valorTotal).toFixed(2)}`,
+        valorTotal: `R$ ${valorTotalNumeric.toFixed(2)}`, // Formata o valor corretamente
         altura: parseFloat(altura),
         cumprimento: parseFloat(cumprimento),
         dataCriacao: new Date().toLocaleString(),
@@ -53,6 +57,7 @@ export default function PedidosScreen() {
         setPedidos([...pedidos, novoPedido]);
       }
 
+      // Limpar os campos
       setNome('');
       setDescricao('');
       setQuantidade('');
@@ -78,10 +83,20 @@ export default function PedidosScreen() {
     setPrioridade(pedido.prioridade);
     setDataEntrega(pedido.dataEntrega);
     setNomeCliente(pedido.nomeCliente);
-    setValorTotal(pedido.valorTotal.replace('R$ ', ''));
+    setValorTotal(pedido.valorTotal.replace('R$ ', '').replace(',', '.')); // Corrige valor para edição
     setAltura(pedido.altura.toString());
     setCumprimento(pedido.cumprimento.toString());
     setShowModal(true);
+  };
+
+  const inputStyle = {
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
+    borderRadius: 5,
+    padding: 12,
+    fontSize: 16,
+    height: 48,
+    placeholderTextColor: "#a0a0a0",
   };
 
   return (
@@ -103,7 +118,7 @@ export default function PedidosScreen() {
         <Button
           onPress={() => setShowModal(true)}
           colorScheme="purple"
-          width="80%"
+          width="50%"
           mb={5}
         >
           Adicionar Pedido
@@ -161,54 +176,90 @@ export default function PedidosScreen() {
           <Modal.Header>{editando ? 'Editar Pedido' : 'Adicionar Pedido'}</Modal.Header>
           <Modal.Body>
             <VStack space={3}>
+              <Text fontSize="md" fontWeight="bold">Nome do Pedido</Text>
               <Input
                 placeholder="Nome do Pedido"
                 value={nome}
                 onChangeText={setNome}
+                style={inputStyle}
               />
+
+              <Text fontSize="md" fontWeight="bold">Descrição do Pedido</Text>
               <Input
                 placeholder="Descrição do Pedido"
                 value={descricao}
                 onChangeText={setDescricao}
+                style={inputStyle}
               />
-              <Input
+
+              <Text fontSize="md" fontWeight="bold">Quantidade</Text>
+              <TextInputMask
                 placeholder="Quantidade"
                 value={quantidade}
                 onChangeText={setQuantidade}
                 keyboardType="numeric"
+                style={inputStyle}
+                type="only-numbers" // Máscara para números
               />
-              <Input
+
+              <Text fontSize="md" fontWeight="bold">Prioridade</Text>
+              <Select
+                selectedValue={prioridade}
+                onValueChange={setPrioridade}
                 placeholder="Prioridade"
-                value={prioridade}
-                onChangeText={setPrioridade}
-              />
-              <Input
-                placeholder="Data de Entrega"
+                style={inputStyle}
+              >
+                <Select.Item label="Alta" value="Alta" />
+                <Select.Item label="Média" value="Média" />
+                <Select.Item label="Baixa" value="Baixa" />
+              </Select>
+
+              <Text fontSize="md" fontWeight="bold">Data de Entrega</Text>
+              <TextInputMask
+                placeholder="DD/MM/AAAA"
                 value={dataEntrega}
                 onChangeText={setDataEntrega}
+                style={inputStyle}
+                type="custom"
+                options={{ mask: '99/99/9999' }} // Máscara de data
               />
+
+              <Text fontSize="md" fontWeight="bold">Nome do Cliente</Text>
               <Input
                 placeholder="Nome do Cliente"
                 value={nomeCliente}
                 onChangeText={setNomeCliente}
+                style={inputStyle}
               />
-              <Input
+
+              <Text fontSize="md" fontWeight="bold">Valor Total (R$)</Text>
+              <TextInputMask
                 placeholder="Valor Total (em R$)"
                 value={valorTotal}
                 onChangeText={setValorTotal}
                 keyboardType="numeric"
+                style={inputStyle}
+                type="money" // Máscara para valores monetários
               />
-              <Input
+
+              <Text fontSize="md" fontWeight="bold">Altura (m)</Text>
+              <TextInputMask
                 placeholder="Altura (m)"
                 value={altura}
                 onChangeText={setAltura}
                 keyboardType="numeric"
+                style={inputStyle}
+                type="only-numbers"
               />
-              <Input
+
+              <Text fontSize="md" fontWeight="bold">Cumprimento (m)</Text>
+              <TextInputMask
                 placeholder="Cumprimento (m)"
                 value={cumprimento}
                 onChangeText={setCumprimento}
                 keyboardType="numeric"
+                style={inputStyle}
+                type="only-numbers"
               />
             </VStack>
           </Modal.Body>
