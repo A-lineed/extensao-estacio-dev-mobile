@@ -1,31 +1,44 @@
 import React, { useState } from 'react';
-import { Button, Text, FlatList, VStack, Box, Center, Heading, IconButton, Icon, Modal, Input, HStack, Image } from 'native-base';
+import {
+  Button,
+  Text,
+  FlatList,
+  VStack,
+  Box,
+  Center,
+  Heading,
+  IconButton,
+  Icon,
+  Modal,
+  Input,
+  HStack,
+  Image,
+} from 'native-base';
 import { Ionicons } from '@expo/vector-icons';
+import MaskInput, { Masks } from 'react-native-mask-input';
 import AppLayout from '../../components/AppLayout';
 
 export default function ClientesScreen() {
   const [clientes, setClientes] = useState([]);
-  const [showModal, setShowModal] = useState(false); // Controle do modal
+  const [showModal, setShowModal] = useState(false);
   const [formData, setFormData] = useState({
     nome: '',
     email: '',
     telefone: '',
     cnpj: '',
+    cep: '',
     nomeEmpresa: '',
     endereco: '',
   });
   const [editando, setEditando] = useState(null);
 
-  // Função para salvar cliente
   const salvarCliente = () => {
-    const { nome, email, telefone, cnpj, nomeEmpresa, endereco } = formData;
+    const { nome, email, telefone, cnpj, cep, nomeEmpresa, endereco } = formData;
     if (nome.trim() && email.trim() && telefone.trim()) {
       if (editando) {
         setClientes((prevClientes) =>
           prevClientes.map((cliente) =>
-            cliente.id === editando.id
-              ? { ...cliente, ...formData }
-              : cliente
+            cliente.id === editando.id ? { ...cliente, ...formData } : cliente
           )
         );
         setEditando(null);
@@ -43,6 +56,7 @@ export default function ClientesScreen() {
         email: '',
         telefone: '',
         cnpj: '',
+        cep: '',
         nomeEmpresa: '',
         endereco: '',
       });
@@ -50,12 +64,10 @@ export default function ClientesScreen() {
     }
   };
 
-  // Função para excluir cliente
   const excluirCliente = (id) => {
     setClientes((prevClientes) => prevClientes.filter((cliente) => cliente.id !== id));
   };
 
-  // Função para editar cliente
   const editarCliente = (cliente) => {
     setEditando(cliente);
     setFormData(cliente);
@@ -65,7 +77,6 @@ export default function ClientesScreen() {
   return (
     <AppLayout title="Clientes">
       <VStack space={5} alignItems="center" flex={1} mt={5} px={4}>
-        {/* Logo no topo */}
         <Center mt={-10}>
           <Image
             source={require('../../assets/images/logo.jpeg')}
@@ -75,7 +86,6 @@ export default function ClientesScreen() {
           />
         </Center>
 
-        {/* Título */}
         <Heading color="purple.500" size="lg" mt={5} mb={5}>
           Administração de Clientes
         </Heading>
@@ -84,7 +94,6 @@ export default function ClientesScreen() {
           Adicionar Cliente
         </Button>
 
-        {/* Lista de clientes */}
         <FlatList
           data={clientes}
           keyExtractor={(item) => item.id}
@@ -95,13 +104,14 @@ export default function ClientesScreen() {
               p={3}
               m={2}
               borderColor="gray.300"
-              bg="#E6E6FA" // Cor roxa clarinha
+              bg="#E6E6FA"
               width="100%"
             >
               <Text fontWeight="bold">Nome: {item.nome}</Text>
               <Text>Email: {item.email}</Text>
               <Text>Telefone: {item.telefone}</Text>
               <Text>CNPJ: {item.cnpj}</Text>
+              <Text>CEP: {item.cep}</Text>
               <Text>Nome da Empresa: {item.nomeEmpresa}</Text>
               <Text>Endereço: {item.endereco}</Text>
               <Text>Data de Cadastro: {item.dataCadastro}</Text>
@@ -129,7 +139,6 @@ export default function ClientesScreen() {
         />
       </VStack>
 
-      {/* Modal de cadastro */}
       <Modal isOpen={showModal} onClose={() => setShowModal(false)}>
         <Modal.Content>
           <Modal.CloseButton />
@@ -140,33 +149,115 @@ export default function ClientesScreen() {
                 placeholder="Nome"
                 value={formData.nome}
                 onChangeText={(value) => setFormData({ ...formData, nome: value })}
+                style={{
+                  borderWidth: 1,
+                  borderColor: '#e0e0e0',
+                  borderRadius: 5,
+                  padding: 12,
+                  fontSize: 16,
+                  height: 48,
+                }}
+                placeholderTextColor="#a0a0a0"
               />
               <Input
                 placeholder="Email"
                 value={formData.email}
                 onChangeText={(value) => setFormData({ ...formData, email: value })}
                 keyboardType="email-address"
+                style={{
+                  borderWidth: 1,
+                  borderColor: '#e0e0e0',
+                  borderRadius: 5,
+                  padding: 12,
+                  fontSize: 16,
+                  height: 48,
+                }}
+                placeholderTextColor="#a0a0a0"
               />
-              <Input
+              <MaskInput
+                style={{
+                  borderWidth: 1,
+                  borderColor: '#e0e0e0',
+                  borderRadius: 5,
+                  padding: 12,
+                  fontSize: 16,
+                  height: 48,
+                }}
                 placeholder="Telefone"
+                placeholderTextColor="#a0a0a0"
                 value={formData.telefone}
-                onChangeText={(value) => setFormData({ ...formData, telefone: value })}
-                keyboardType="phone-pad"
+                onChangeText={(masked, unmasked) => {
+                  if (unmasked.length <= 11) {
+                    setFormData({ ...formData, telefone: masked });
+                  }
+                }}
+                mask={Masks.BRL_PHONE}
               />
-              <Input
+              <MaskInput
+                style={{
+                  borderWidth: 1,
+                  borderColor: '#e0e0e0',
+                  borderRadius: 5,
+                  padding: 12,
+                  fontSize: 16,
+                  height: 48,
+                }}
                 placeholder="CNPJ"
+                placeholderTextColor="#a0a0a0"
                 value={formData.cnpj}
-                onChangeText={(value) => setFormData({ ...formData, cnpj: value })}
+                onChangeText={(masked, unmasked) => {
+                  if (unmasked.length <= 14) {
+                    setFormData({ ...formData, cnpj: masked });
+                  }
+                }}
+                mask={Masks.BRL_CNPJ}
+              />
+              <MaskInput
+                style={{
+                  borderWidth: 1,
+                  borderColor: '#e0e0e0',
+                  borderRadius: 5,
+                  padding: 12,
+                  fontSize: 16,
+                  height: 48,
+                }}
+                placeholder="CEP"
+                placeholderTextColor="#a0a0a0"
+                value={formData.cep}
+                onChangeText={(masked, unmasked) => {
+                  if (unmasked.length <= 8) {
+                    setFormData({ ...formData, cep: masked });
+                  }
+                }}
+                mask={Masks.ZIP_CODE}
               />
               <Input
                 placeholder="Nome da Empresa"
                 value={formData.nomeEmpresa}
                 onChangeText={(value) => setFormData({ ...formData, nomeEmpresa: value })}
+                style={{
+                  borderWidth: 1,
+                  borderColor: '#e0e0e0',
+                  borderRadius: 5,
+                  padding: 12,
+                  fontSize: 16,
+                  height: 48,
+                }}
+                placeholderTextColor="#a0a0a0"
               />
               <Input
                 placeholder="Endereço"
                 value={formData.endereco}
                 onChangeText={(value) => setFormData({ ...formData, endereco: value })}
+                style={{
+                  borderWidth: 1,
+                  borderColor: '#e0e0e0',
+                  borderRadius: 5,
+                  padding: 12,
+                  fontSize: 16,
+                  height: 48,
+                }}
+                placeholderTextColor="#a0a0a0"
               />
             </VStack>
           </Modal.Body>
