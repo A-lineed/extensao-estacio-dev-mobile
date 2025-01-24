@@ -17,9 +17,7 @@ export default function PedidosScreen() {
   const [valorTotal, setValorTotal] = useState('');
   const [altura, setAltura] = useState('');
   const [cumprimento, setCumprimento] = useState('');
-  const [status, setStatus] = useState(''); // Estado para o Status
   const [editando, setEditando] = useState(null);
-  const [filtroPrioridade, setFiltroPrioridade] = useState('');
 
   const navigation = useNavigation(); // Hook para navegação
 
@@ -34,8 +32,7 @@ export default function PedidosScreen() {
       nomeCliente.trim() &&
       !isNaN(valorTotalNumeric) && 
       altura.trim() &&
-      cumprimento.trim() &&
-      status.trim() // Verificar se o status foi preenchido
+      cumprimento.trim()
     ) {
       const novoPedido = {
         id: editando ? editando.id : Date.now().toString(),
@@ -48,7 +45,6 @@ export default function PedidosScreen() {
         valorTotal: `R$ ${valorTotalNumeric.toFixed(2)}`, 
         altura: parseFloat(altura),
         cumprimento: parseFloat(cumprimento),
-        status, // Adicionando o status ao novo pedido
         dataCriacao: new Date().toLocaleString(),
       };
 
@@ -72,7 +68,6 @@ export default function PedidosScreen() {
       setValorTotal('');
       setAltura('');
       setCumprimento('');
-      setStatus(''); // Resetando o status
       setShowModal(false);
     }
   };
@@ -92,7 +87,6 @@ export default function PedidosScreen() {
     setValorTotal(pedido.valorTotal.replace('R$ ', '').replace(',', '.'));
     setAltura(pedido.altura.toString());
     setCumprimento(pedido.cumprimento.toString());
-    setStatus(pedido.status); // Preenchendo o campo status no modo de edição
     setShowModal(true);
   };
 
@@ -106,20 +100,11 @@ export default function PedidosScreen() {
     placeholderTextColor: "#a0a0a0",
   };
 
-  const filtrarPedidos = () => {
-    return pedidos.filter((pedido) => {
-      // Filtrando por prioridade
-      const prioridadeMatch = filtroPrioridade ? pedido.prioridade === filtroPrioridade : true;
-
-      return prioridadeMatch;
-    });
-  };
-
   return (
     <AppLayout title="Cadastro de Pedidos">
-      <VStack space={1} alignItems="center" flex={1} mt={5}>
+      <VStack space={5} alignItems="center" flex={1} mt={5}>
         {/* Botão de Voltar para a tela Home */}
-        <HStack justifyContent="flex-start" width="100%" px={5} mt={4}>
+        <HStack justifyContent="flex-start" width="100%" px={4} mt={4}>
           <Button
             onPress={() => navigation.navigate('home')} // Navega para a tela Home
             colorScheme="blue"
@@ -131,7 +116,7 @@ export default function PedidosScreen() {
           </Button>
         </HStack>
 
-        <Center mt={-2}>
+        <Center mt={5}>
           <Image
             source={require('../../assets/images/logo.jpeg')}
             alt="Logo"
@@ -153,24 +138,8 @@ export default function PedidosScreen() {
           Adicionar Pedido
         </Button>
 
-        {/* Filtros */}
-        <HStack space={3} alignItems="center" width="80%" mb={4}>
-          <Text fontSize="md" fontWeight="bold">Prioridade</Text> {/* Adicionando o nome "Prioridade" */}
-          <Select
-            selectedValue={filtroPrioridade}
-            onValueChange={setFiltroPrioridade}
-            placeholder="Filtrar por Prioridade"
-            style={inputStyle}
-          >
-            <Select.Item label="Todos" value="" />
-            <Select.Item label="Alta" value="Alta" />
-            <Select.Item label="Média" value="Média" />
-            <Select.Item label="Baixa" value="Baixa" />
-          </Select>
-        </HStack>
-
         <FlatList
-          data={filtrarPedidos()}
+          data={pedidos}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
             <Box
@@ -185,7 +154,6 @@ export default function PedidosScreen() {
               <Text>Descrição: {item.descricao}</Text>
               <Text>Quantidade: {item.quantidade}</Text>
               <Text>Prioridade: {item.prioridade}</Text>
-              <Text>Status: {item.status}</Text> {/* Exibindo o status */}
               <Text>Data de Entrega: {item.dataEntrega}</Text>
               <Text>Nome do Cliente: {item.nomeCliente}</Text>
               <Text>Valor Total: {item.valorTotal}</Text>
@@ -260,19 +228,6 @@ export default function PedidosScreen() {
                 <Select.Item label="Baixa" value="Baixa" />
               </Select>
 
-              <Text fontSize="md" fontWeight="bold">Status</Text>
-              <Select
-                selectedValue={status}
-                onValueChange={setStatus}
-                placeholder="Status"
-                style={inputStyle}
-              >
-                <Select.Item label="Pendente" value="Pendente" />
-                <Select.Item label="Em andamento" value="Em andamento" />
-                <Select.Item label="Em rota de entrega" value="Em rota de entrega" />
-                <Select.Item label="Entregue" value="Entregue" />
-              </Select>
-
               <Text fontSize="md" fontWeight="bold">Data de Entrega</Text>
               <TextInputMask
                 placeholder="DD/MM/AAAA"
@@ -323,8 +278,8 @@ export default function PedidosScreen() {
             </VStack>
           </Modal.Body>
           <Modal.Footer>
-            <Button onPress={adicionarOuEditarPedido} colorScheme="blue">
-              {editando ? 'Atualizar Pedido' : 'Adicionar Pedido'}
+            <Button onPress={adicionarOuEditarPedido} colorScheme="purple">
+              {editando ? 'Salvar Alterações' : 'Adicionar Pedido'}
             </Button>
           </Modal.Footer>
         </Modal.Content>
