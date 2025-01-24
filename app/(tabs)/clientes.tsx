@@ -18,6 +18,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import MaskInput, { Masks } from 'react-native-mask-input';
 import AppLayout from '../../components/AppLayout';
+import { useNavigation } from '@react-navigation/native'; // Importando a navegação
 
 export default function ClientesScreen() {
   const [clientes, setClientes] = useState([]);
@@ -42,6 +43,7 @@ export default function ClientesScreen() {
   });
   const [editando, setEditando] = useState(null);
   const toast = useToast();
+  const navigation = useNavigation(); // Hook para navegação
 
   const salvarCliente = () => {
     const { nome, email, telefone, cnpj, cep, nomeEmpresa, endereco } = formData;
@@ -110,7 +112,20 @@ export default function ClientesScreen() {
 
   return (
     <AppLayout title="Clientes">
-      <VStack space={5} alignItems="center" flex={1} mt={5} px={4}>
+      <VStack space={10} alignItems="center" flex={1} mt={5} px={4}>
+        {/* Botão de Voltar para Home */}
+        <HStack justifyContent="flex-start" width="100%" px={4} mt={4}>
+          <Button
+            onPress={() => navigation.navigate('home')} // Navega para a tela "Home"
+            colorScheme="blue"
+            width="30%"
+            variant="ghost"
+            leftIcon={<Ionicons name="arrow-back" size={24} color="blue" />}
+          >
+            Voltar
+          </Button>
+        </HStack>
+
         <Center mt={-10}>
           <Image
             source={require('../../assets/images/logo.jpeg')}

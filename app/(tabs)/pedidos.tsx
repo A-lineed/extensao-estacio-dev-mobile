@@ -3,6 +3,7 @@ import { Button, Input, Text, FlatList, VStack, HStack, Box, Center, Heading, Ic
 import { Ionicons } from '@expo/vector-icons';
 import { TextInputMask } from 'react-native-masked-text'; // Importando o TextInputMask
 import AppLayout from '../../components/AppLayout';
+import { useNavigation } from '@react-navigation/native'; // Importando o hook de navegação
 
 export default function PedidosScreen() {
   const [pedidos, setPedidos] = useState([]);
@@ -18,8 +19,9 @@ export default function PedidosScreen() {
   const [cumprimento, setCumprimento] = useState('');
   const [editando, setEditando] = useState(null);
 
+  const navigation = useNavigation(); // Hook para navegação
+
   const adicionarOuEditarPedido = () => {
-    // Verifica se o valor total é um número válido
     const valorTotalNumeric = parseFloat(valorTotal.replace('R$', '').replace(',', '.').trim());
 
     if (
@@ -28,7 +30,7 @@ export default function PedidosScreen() {
       prioridade.trim() &&
       dataEntrega.trim() &&
       nomeCliente.trim() &&
-      !isNaN(valorTotalNumeric) && // Verifica se o valor total é um número válido
+      !isNaN(valorTotalNumeric) && 
       altura.trim() &&
       cumprimento.trim()
     ) {
@@ -40,7 +42,7 @@ export default function PedidosScreen() {
         prioridade,
         dataEntrega,
         nomeCliente,
-        valorTotal: `R$ ${valorTotalNumeric.toFixed(2)}`, // Formata o valor corretamente
+        valorTotal: `R$ ${valorTotalNumeric.toFixed(2)}`, 
         altura: parseFloat(altura),
         cumprimento: parseFloat(cumprimento),
         dataCriacao: new Date().toLocaleString(),
@@ -57,7 +59,6 @@ export default function PedidosScreen() {
         setPedidos([...pedidos, novoPedido]);
       }
 
-      // Limpar os campos
       setNome('');
       setDescricao('');
       setQuantidade('');
@@ -83,7 +84,7 @@ export default function PedidosScreen() {
     setPrioridade(pedido.prioridade);
     setDataEntrega(pedido.dataEntrega);
     setNomeCliente(pedido.nomeCliente);
-    setValorTotal(pedido.valorTotal.replace('R$ ', '').replace(',', '.')); // Corrige valor para edição
+    setValorTotal(pedido.valorTotal.replace('R$ ', '').replace(',', '.'));
     setAltura(pedido.altura.toString());
     setCumprimento(pedido.cumprimento.toString());
     setShowModal(true);
@@ -102,6 +103,19 @@ export default function PedidosScreen() {
   return (
     <AppLayout title="Cadastro de Pedidos">
       <VStack space={5} alignItems="center" flex={1} mt={5}>
+        {/* Botão de Voltar para a tela Home */}
+        <HStack justifyContent="flex-start" width="100%" px={4} mt={4}>
+          <Button
+            onPress={() => navigation.navigate('home')} // Navega para a tela Home
+            colorScheme="blue"
+            width="30%"
+            variant="ghost"
+            leftIcon={<Ionicons name="arrow-back" size={24} color="blue" />}
+          >
+            Voltar
+          </Button>
+        </HStack>
+
         <Center mt={5}>
           <Image
             source={require('../../assets/images/logo.jpeg')}
@@ -199,7 +213,7 @@ export default function PedidosScreen() {
                 onChangeText={setQuantidade}
                 keyboardType="numeric"
                 style={inputStyle}
-                type="only-numbers" // Máscara para números
+                type="only-numbers"
               />
 
               <Text fontSize="md" fontWeight="bold">Prioridade</Text>
@@ -221,7 +235,7 @@ export default function PedidosScreen() {
                 onChangeText={setDataEntrega}
                 style={inputStyle}
                 type="custom"
-                options={{ mask: '99/99/9999' }} // Máscara de data
+                options={{ mask: '99/99/9999' }} 
               />
 
               <Text fontSize="md" fontWeight="bold">Nome do Cliente</Text>
@@ -239,7 +253,7 @@ export default function PedidosScreen() {
                 onChangeText={setValorTotal}
                 keyboardType="numeric"
                 style={inputStyle}
-                type="money" // Máscara para valores monetários
+                type="money"
               />
 
               <Text fontSize="md" fontWeight="bold">Altura (m)</Text>

@@ -90,7 +90,7 @@ export default function RelatorioScreen() {
             mt={6}
             bg="purple.600"
             _pressed={{ bg: 'purple.700' }}
-            onPress={() => router.push('/home')}
+            onPress={() => router.push('/home')} // Navega para a tela Home
             _text={{ color: 'white', fontWeight: 'bold' }}
           >
             Voltar para o Início
