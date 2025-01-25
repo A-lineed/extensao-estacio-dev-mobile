@@ -14,11 +14,13 @@ import {
   HStack,
   Image,
   useToast,
+  Spinner,  // Importando Spinner do NativeBase
 } from 'native-base';
 import { Ionicons } from '@expo/vector-icons';
 import MaskInput, { Masks } from 'react-native-mask-input';
+import * as ImagePicker from 'expo-image-picker';
 import AppLayout from '../../components/AppLayout';
-import { useNavigation } from '@react-navigation/native'; // Importando a navegação
+import { useNavigation } from '@react-navigation/native';
 
 export default function ClientesScreen() {
   const [clientes, setClientes] = useState([]);
@@ -31,6 +33,7 @@ export default function ClientesScreen() {
     cep: '',
     nomeEmpresa: '',
     endereco: '',
+    imagem: null,
   });
   const [errors, setErrors] = useState({
     nome: '',
@@ -41,14 +44,14 @@ export default function ClientesScreen() {
     nomeEmpresa: '',
     endereco: '',
   });
+  const [loading, setLoading] = useState(false);
   const [editando, setEditando] = useState(null);
   const toast = useToast();
-  const navigation = useNavigation(); // Hook para navegação
+  const navigation = useNavigation();
 
   const salvarCliente = () => {
     const { nome, email, telefone, cnpj, cep, nomeEmpresa, endereco } = formData;
 
-    // Resetando os erros
     setErrors({
       nome: nome ? '' : 'Nome é obrigatório.',
       email: email ? '' : 'Email é obrigatório.',
@@ -59,7 +62,6 @@ export default function ClientesScreen() {
       endereco: endereco ? '' : 'Endereço é obrigatório.',
     });
 
-    // Verificar se todos os campos estão preenchidos
     if (!nome || !email || !telefone || !cnpj || !cep || !nomeEmpresa || !endereco) {
       toast.show({
         title: 'Por favor, preencha todos os campos obrigatórios.',
@@ -68,36 +70,39 @@ export default function ClientesScreen() {
       return;
     }
 
-    // Se estiver editando, atualizar o cliente
-    if (editando) {
-      setClientes((prevClientes) =>
-        prevClientes.map((cliente) =>
-          cliente.id === editando.id ? { ...cliente, ...formData } : cliente
-        )
-      );
-      setEditando(null);
-    } else {
-      // Se for novo cliente, adicionar
-      const novoCliente = {
-        id: Date.now().toString(),
-        ...formData,
-        dataCadastro: new Date().toLocaleString(),
-      };
-      setClientes([...clientes, novoCliente]);
-    }
+    setLoading(true);
 
-    // Limpar o formulário
-    setFormData({
-      nome: '',
-      email: '',
-      telefone: '',
-      cnpj: '',
-      cep: '',
-      nomeEmpresa: '',
-      endereco: '',
-    });
+    setTimeout(() => {
+      if (editando) {
+        setClientes((prevClientes) =>
+          prevClientes.map((cliente) =>
+            cliente.id === editando.id ? { ...cliente, ...formData } : cliente
+          )
+        );
+        setEditando(null);
+      } else {
+        const novoCliente = {
+          id: Date.now().toString(),
+          ...formData,
+          dataCadastro: new Date().toLocaleString(),
+        };
+        setClientes([...clientes, novoCliente]);
+      }
 
-    setShowModal(false);
+      setFormData({
+        nome: '',
+        email: '',
+        telefone: '',
+        cnpj: '',
+        cep: '',
+        nomeEmpresa: '',
+        endereco: '',
+        imagem: null,
+      });
+
+      setShowModal(false);
+      setLoading(false);
+    }, 1000);
   };
 
   const excluirCliente = (id) => {
@@ -110,13 +115,25 @@ export default function ClientesScreen() {
     setShowModal(true);
   };
 
+  const pickImage = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    if (!result.canceled) {
+      setFormData({ ...formData, imagem: result.assets[0].uri });
+    }
+  };
+
   return (
     <AppLayout title="Clientes">
       <VStack space={10} alignItems="center" flex={1} mt={-4} px={4}>
-        {/* Botão de Voltar para Home */}
         <HStack justifyContent="flex-start" width="100%" px={4} mt={4}>
           <Button
-            onPress={() => navigation.navigate('home')} // Navega para a tela "Home"
+            onPress={() => navigation.navigate('home')}
             colorScheme="blue"
             width="30%"
             variant="ghost"
@@ -157,6 +174,16 @@ export default function ClientesScreen() {
               bg="#E6E6FA"
               width="100%"
             >
+              {item.imagem && (
+                <Image
+                  source={{ uri: item.imagem }}
+                  alt="Imagem do Cliente"
+                  width={50}
+                  height={50}
+                  borderRadius="full"
+                  mb={2}
+                />
+              )}
               <Text fontWeight="bold">Nome: {item.nome}</Text>
               <Text>Email: {item.email}</Text>
               <Text>Telefone: {item.telefone}</Text>
@@ -281,12 +308,33 @@ export default function ClientesScreen() {
                 style={styles.input}
                 placeholderTextColor="#a0a0a0"
               />
+              <Button onPress={pickImage} colorScheme="blue" mt={2}>
+                Selecionar Imagem
+              </Button>
+              {formData.imagem && (
+                <Image
+                  source={{ uri: formData.imagem }}
+                  alt="Imagem Selecionada"
+                  width={100}
+                  height={100}
+                  mt={2}
+                />
+              )}
             </VStack>
           </Modal.Body>
           <Modal.Footer>
-            <Button onPress={salvarCliente} colorScheme="purple">
-              {editando ? 'Salvar Alterações' : 'Adicionar Cliente'}
-            </Button>
+            {loading ? (
+              <Spinner />
+            ) : (
+              <>
+                <Button onPress={salvarCliente} colorScheme="purple" mr={2}>
+                  {editando ? 'Salvar Alterações' : 'Adicionar Cliente'}
+                </Button>
+                <Button variant="ghost" onPress={() => setShowModal(false)}>
+                  Cancelar
+                </Button>
+              </>
+            )}
           </Modal.Footer>
         </Modal.Content>
       </Modal>
