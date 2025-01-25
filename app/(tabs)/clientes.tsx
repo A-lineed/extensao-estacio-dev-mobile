@@ -112,7 +112,7 @@ export default function ClientesScreen() {
 
   return (
     <AppLayout title="Clientes">
-      <VStack space={10} alignItems="center" flex={1} mt={5} px={4}>
+      <VStack space={10} alignItems="center" flex={1} mt={-4} px={4}>
         {/* Botão de Voltar para Home */}
         <HStack justifyContent="flex-start" width="100%" px={4} mt={4}>
           <Button
@@ -135,11 +135,11 @@ export default function ClientesScreen() {
           />
         </Center>
 
-        <Heading color="purple.500" size="lg" mt={5} mb={5}>
+        <Heading color="purple.500" size="lg" mt={1} mb={-5}>
           Administração de Clientes
         </Heading>
 
-        <Button onPress={() => setShowModal(true)} colorScheme="purple" width="50%" mb={5}>
+        <Button onPress={() => setShowModal(true)} colorScheme="purple" width="50%" mb={0}>
           Adicionar Cliente
         </Button>
 
