@@ -24,13 +24,13 @@ export default function LoginScreen() {
     <Center flex={1} bg="#E6E6FA"> {/* Fundo roxo clarinho */}
       <Box
         safeArea
-        p="4"
-        py="8"
-        w="90%"
+        p="10"
+        py="120"
+        w="95%"
         maxW="400"
         bg="white"
         borderRadius="lg"
-        shadow={4}
+        shadow={2}
       >
         <Center mb={6}>
           <Image
@@ -53,7 +53,7 @@ export default function LoginScreen() {
             <Input
               value={username}
               onChangeText={setUsername}
-              placeholder="Nome de Usuário"
+              placeholder="Nome de usuário"
               bg="gray.100"
               InputLeftElement={
                 <Icon as={<Ionicons name="person" />} size="sm" ml="2" color="muted.400" />
@@ -87,7 +87,7 @@ export default function LoginScreen() {
           </Button>
         </VStack>
       </Box>
-      <Box mt={20} alignItems="center">
+      <Box mt={30} alignItems="center">
         <Text fontSize="xs" color="gray.500" textAlign="center">
           &copy; {new Date().getFullYear()} Sistema de Gestão Empresarial Soluções Facas. Todos os direitos reservados.
         </Text>

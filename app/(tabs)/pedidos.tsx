@@ -18,6 +18,7 @@ export default function PedidosScreen() {
   const [altura, setAltura] = useState('');
   const [cumprimento, setCumprimento] = useState('');
   const [editando, setEditando] = useState(null);
+  const [filtroPrioridade, setFiltroPrioridade] = useState(''); // Estado para o filtro de prioridade
 
   const navigation = useNavigation(); // Hook para navegação
 
@@ -100,6 +101,11 @@ export default function PedidosScreen() {
     placeholderTextColor: "#a0a0a0",
   };
 
+  // Filtra os pedidos com base na prioridade selecionada
+  const pedidosFiltrados = pedidos.filter(pedido =>
+    filtroPrioridade ? pedido.prioridade === filtroPrioridade : true
+  );
+
   return (
     <AppLayout title="Cadastro de Pedidos">
       <VStack space={5} alignItems="center" flex={1} mt={5}>
@@ -129,6 +135,26 @@ export default function PedidosScreen() {
           Cadastro de Pedidos
         </Heading>
 
+        <HStack space={2} width="80%" mb={5}>
+          <VStack width="100%">
+            <Text fontSize="md" fontWeight="bold" mb={2}>
+              Filtrar por Prioridade
+            </Text>
+            <Select
+              selectedValue={filtroPrioridade}
+              onValueChange={setFiltroPrioridade}
+              placeholder="Selecione a Prioridade"
+              style={inputStyle}
+              width="100%"
+            >
+              <Select.Item label="Todas" value="" />
+              <Select.Item label="Alta" value="Alta" />
+              <Select.Item label="Média" value="Média" />
+              <Select.Item label="Baixa" value="Baixa" />
+            </Select>
+          </VStack>
+        </HStack>
+
         <Button
           onPress={() => setShowModal(true)}
           colorScheme="purple"
@@ -139,7 +165,7 @@ export default function PedidosScreen() {
         </Button>
 
         <FlatList
-          data={pedidos}
+          data={pedidosFiltrados}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
             <Box
