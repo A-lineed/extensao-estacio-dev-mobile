@@ -130,12 +130,13 @@ export default function ClientesScreen() {
           <Image
             source={require('../../assets/images/logo.jpeg')}
             alt="Logo"
-            size="lg"
+            width={150} // Defina a largura desejada
+            height={150} // Defina a altura desejada
             resizeMode="contain"
           />
         </Center>
 
-        <Heading color="purple.500" size="lg" mt={1} mb={-5}>
+        <Heading color="purple.500" size="lg" mt={-2} mb={-5}>
           Administração de Clientes
         </Heading>
 
