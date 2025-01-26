@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Button, Input, Text, FlatList, VStack, HStack, Box, Center, Heading, IconButton, Icon, Modal, Image, Select } from 'native-base';
+import { Button, Input, Text, FlatList, VStack, HStack, Box, Center, Heading, IconButton, Icon, Modal, Image, Select, FormControl, WarningOutlineIcon, Spinner } from 'native-base';
 import { Ionicons } from '@expo/vector-icons';
 import { TextInputMask } from 'react-native-masked-text'; // Importando o TextInputMask
 import AppLayout from '../../components/AppLayout';
@@ -19,22 +19,33 @@ export default function PedidosScreen() {
   const [cumprimento, setCumprimento] = useState('');
   const [editando, setEditando] = useState(null);
   const [filtroPrioridade, setFiltroPrioridade] = useState(''); // Estado para o filtro de prioridade
+  const [loading, setLoading] = useState(false); // Estado para o carregamento
+  const [errors, setErrors] = useState({}); // Estado para os erros
 
   const navigation = useNavigation(); // Hook para navegação
 
   const adicionarOuEditarPedido = () => {
     const valorTotalNumeric = parseFloat(valorTotal.replace('R$', '').replace(',', '.').trim());
 
-    if (
-      nome.trim() &&
-      quantidade.trim() &&
-      prioridade.trim() &&
-      dataEntrega.trim() &&
-      nomeCliente.trim() &&
-      !isNaN(valorTotalNumeric) && 
-      altura.trim() &&
-      cumprimento.trim()
-    ) {
+    // Validação dos campos
+    const newErrors = {};
+    if (!nome.trim()) newErrors.nome = 'Nome é obrigatório';
+    if (!quantidade.trim()) newErrors.quantidade = 'Quantidade é obrigatória';
+    if (!prioridade.trim()) newErrors.prioridade = 'Prioridade é obrigatória';
+    if (!dataEntrega.trim()) newErrors.dataEntrega = 'Data de entrega é obrigatória';
+    if (!nomeCliente.trim()) newErrors.nomeCliente = 'Nome do cliente é obrigatório';
+    if (isNaN(valorTotalNumeric)) newErrors.valorTotal = 'Valor total é obrigatório';
+    if (!altura.trim()) newErrors.altura = 'Altura é obrigatória';
+    if (!cumprimento.trim()) newErrors.cumprimento = 'Cumprimento é obrigatório';
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+
+    setLoading(true);
+
+    setTimeout(() => {
       const novoPedido = {
         id: editando ? editando.id : Date.now().toString(),
         nome,
@@ -43,7 +54,7 @@ export default function PedidosScreen() {
         prioridade,
         dataEntrega,
         nomeCliente,
-        valorTotal: `R$ ${valorTotalNumeric.toFixed(2)}`, 
+        valorTotal: `R$ ${valorTotalNumeric.toFixed(2)}`,
         altura: parseFloat(altura),
         cumprimento: parseFloat(cumprimento),
         dataCriacao: new Date().toLocaleString(),
@@ -70,7 +81,9 @@ export default function PedidosScreen() {
       setAltura('');
       setCumprimento('');
       setShowModal(false);
-    }
+      setLoading(false);
+      setErrors({});
+    }, 1000);
   };
 
   const excluirPedido = (id) => {
@@ -108,7 +121,7 @@ export default function PedidosScreen() {
 
   return (
     <AppLayout title="Cadastro de Pedidos">
-      <VStack space={5} alignItems="center" flex={1} mt={5}>
+      <VStack space={6} alignItems="center" flex={1} mt={-7} pb={0}>
         {/* Botão de Voltar para a tela Home */}
         <HStack justifyContent="flex-start" width="100%" px={4} mt={4}>
           <Button
@@ -122,44 +135,41 @@ export default function PedidosScreen() {
           </Button>
         </HStack>
 
-        <Center mt={5}>
+        <Center mt={-10}>
           <Image
             source={require('../../assets/images/logo.jpeg')}
             alt="Logo"
-            size="lg"
+            width={150} // Defina a largura desejada
+            height={150} // Defina a altura desejada
             resizeMode="contain"
           />
         </Center>
 
-        <Heading color="purple.500" size="lg" mb={5}>
+        <Heading color="purple.500" size="lg" mb={-3}>
           Cadastro de Pedidos
         </Heading>
 
-        <HStack space={2} width="80%" mb={5}>
-          <VStack width="100%">
-            <Text fontSize="md" fontWeight="bold" mb={2}>
-              Filtrar por Prioridade
-            </Text>
-            <Select
-              selectedValue={filtroPrioridade}
-              onValueChange={setFiltroPrioridade}
-              placeholder="Selecione a Prioridade"
-              style={inputStyle}
-              width="100%"
-            >
-              <Select.Item label="Todas" value="" />
-              <Select.Item label="Alta" value="Alta" />
-              <Select.Item label="Média" value="Média" />
-              <Select.Item label="Baixa" value="Baixa" />
-            </Select>
-          </VStack>
-        </HStack>
+        <VStack width="85%" mb={-5}>
+          <Text fontSize="md" fontWeight="bold" mb={2}>
+            Filtrar por Prioridade
+          </Text>
+          <Select
+            selectedValue={filtroPrioridade}
+            onValueChange={setFiltroPrioridade}
+            placeholder="Selecione a Prioridade"
+            style={inputStyle}
+          >
+            <Select.Item label="Todas" value="" />
+            <Select.Item label="Alta" value="Alta" />
+            <Select.Item label="Média" value="Média" />
+            <Select.Item label="Baixa" value="Baixa" />
+          </Select>
+        </VStack>
 
         <Button
           onPress={() => setShowModal(true)}
           colorScheme="purple"
-          width="50%"
-          mb={5}
+          width="40%"
         >
           Adicionar Pedido
         </Button>
@@ -174,7 +184,7 @@ export default function PedidosScreen() {
               p={3}
               m={2}
               borderColor="gray.300"
-              width="80%"
+              width="100%" // Ajuste para garantir que os itens ocupem a largura total disponível
             >
               <Text fontWeight="bold">Nome: {item.nome}</Text>
               <Text>Descrição: {item.descricao}</Text>
@@ -207,6 +217,7 @@ export default function PedidosScreen() {
               Nenhum pedido cadastrado.
             </Text>
           }
+          contentContainerStyle={{ paddingBottom: 20 }} // Adiciona padding no final da lista
         />
       </VStack>
 
@@ -216,97 +227,164 @@ export default function PedidosScreen() {
           <Modal.Header>{editando ? 'Editar Pedido' : 'Adicionar Pedido'}</Modal.Header>
           <Modal.Body>
             <VStack space={3}>
-              <Text fontSize="md" fontWeight="bold">Nome do Pedido</Text>
-              <Input
-                placeholder="Nome do Pedido"
-                value={nome}
-                onChangeText={setNome}
-                style={inputStyle}
-              />
+              <FormControl isInvalid={'nome' in errors}>
+                <FormControl.Label>Nome do Pedido</FormControl.Label>
+                <Input
+                  placeholder="Nome do Pedido"
+                  value={nome}
+                  onChangeText={setNome}
+                  style={inputStyle}
+                />
+                {'nome' in errors && (
+                  <FormControl.ErrorMessage leftIcon={<WarningOutlineIcon size="xs" />}>
+                    {errors.nome}
+                  </FormControl.ErrorMessage>
+                )}
+              </FormControl>
 
-              <Text fontSize="md" fontWeight="bold">Descrição do Pedido</Text>
-              <Input
-                placeholder="Descrição do Pedido"
-                value={descricao}
-                onChangeText={setDescricao}
-                style={inputStyle}
-              />
+              <FormControl>
+                <FormControl.Label>Descrição do Pedido</FormControl.Label>
+                <Input
+                  placeholder="Descrição do Pedido"
+                  value={descricao}
+                  onChangeText={setDescricao}
+                  style={inputStyle}
+                />
+              </FormControl>
 
-              <Text fontSize="md" fontWeight="bold">Quantidade</Text>
-              <TextInputMask
-                placeholder="Quantidade"
-                value={quantidade}
-                onChangeText={setQuantidade}
-                keyboardType="numeric"
-                style={inputStyle}
-                type="only-numbers"
-              />
+              <FormControl isInvalid={'quantidade' in errors}>
+                <FormControl.Label>Quantidade</FormControl.Label>
+                <TextInputMask
+                  placeholder="Quantidade"
+                  value={quantidade}
+                  onChangeText={setQuantidade}
+                  keyboardType="numeric"
+                  style={inputStyle}
+                  type="only-numbers"
+                />
+                {'quantidade' in errors && (
+                  <FormControl.ErrorMessage leftIcon={<WarningOutlineIcon size="xs" />}>
+                    {errors.quantidade}
+                  </FormControl.ErrorMessage>
+                )}
+              </FormControl>
 
-              <Text fontSize="md" fontWeight="bold">Prioridade</Text>
-              <Select
-                selectedValue={prioridade}
-                onValueChange={setPrioridade}
-                placeholder="Prioridade"
-                style={inputStyle}
-              >
-                <Select.Item label="Alta" value="Alta" />
-                <Select.Item label="Média" value="Média" />
-                <Select.Item label="Baixa" value="Baixa" />
-              </Select>
+              <FormControl isInvalid={'prioridade' in errors}>
+                <FormControl.Label>Prioridade</FormControl.Label>
+                <Select
+                  selectedValue={prioridade}
+                  onValueChange={setPrioridade}
+                  placeholder="Prioridade"
+                  style={inputStyle}
+                >
+                  <Select.Item label="Alta" value="Alta" />
+                  <Select.Item label="Média" value="Média" />
+                  <Select.Item label="Baixa" value="Baixa" />
+                </Select>
+                {'prioridade' in errors && (
+                  <FormControl.ErrorMessage leftIcon={<WarningOutlineIcon size="xs" />}>
+                    {errors.prioridade}
+                  </FormControl.ErrorMessage>
+                )}
+              </FormControl>
 
-              <Text fontSize="md" fontWeight="bold">Data de Entrega</Text>
-              <TextInputMask
-                placeholder="DD/MM/AAAA"
-                value={dataEntrega}
-                onChangeText={setDataEntrega}
-                style={inputStyle}
-                type="custom"
-                options={{ mask: '99/99/9999' }} 
-              />
+              <FormControl isInvalid={'dataEntrega' in errors}>
+                <FormControl.Label>Data de Entrega</FormControl.Label>
+                <TextInputMask
+                  placeholder="DD/MM/AAAA"
+                  value={dataEntrega}
+                  onChangeText={setDataEntrega}
+                  style={inputStyle}
+                  type="custom"
+                  options={{ mask: '99/99/9999' }}
+                />
+                {'dataEntrega' in errors && (
+                  <FormControl.ErrorMessage leftIcon={<WarningOutlineIcon size="xs" />}>
+                    {errors.dataEntrega}
+                  </FormControl.ErrorMessage>
+                )}
+              </FormControl>
 
-              <Text fontSize="md" fontWeight="bold">Nome do Cliente</Text>
-              <Input
-                placeholder="Nome do Cliente"
-                value={nomeCliente}
-                onChangeText={setNomeCliente}
-                style={inputStyle}
-              />
+              <FormControl isInvalid={'nomeCliente' in errors}>
+                <FormControl.Label>Nome do Cliente</FormControl.Label>
+                <Input
+                  placeholder="Nome do Cliente"
+                  value={nomeCliente}
+                  onChangeText={setNomeCliente}
+                  style={inputStyle}
+                />
+                {'nomeCliente' in errors && (
+                  <FormControl.ErrorMessage leftIcon={<WarningOutlineIcon size="xs" />}>
+                    {errors.nomeCliente}
+                  </FormControl.ErrorMessage>
+                )}
+              </FormControl>
 
-              <Text fontSize="md" fontWeight="bold">Valor Total (R$)</Text>
-              <TextInputMask
-                placeholder="Valor Total (em R$)"
-                value={valorTotal}
-                onChangeText={setValorTotal}
-                keyboardType="numeric"
-                style={inputStyle}
-                type="money"
-              />
+              <FormControl isInvalid={'valorTotal' in errors}>
+                <FormControl.Label>Valor Total (R$)</FormControl.Label>
+                <TextInputMask
+                  placeholder="Valor Total (em R$)"
+                  value={valorTotal}
+                  onChangeText={setValorTotal}
+                  keyboardType="numeric"
+                  style={inputStyle}
+                  type="money"
+                />
+                {'valorTotal' in errors && (
+                  <FormControl.ErrorMessage leftIcon={<WarningOutlineIcon size="xs" />}>
+                    {errors.valorTotal}
+                  </FormControl.ErrorMessage>
+                )}
+              </FormControl>
 
-              <Text fontSize="md" fontWeight="bold">Altura (m)</Text>
-              <TextInputMask
-                placeholder="Altura (m)"
-                value={altura}
-                onChangeText={setAltura}
-                keyboardType="numeric"
-                style={inputStyle}
-                type="only-numbers"
-              />
+              <FormControl isInvalid={'altura' in errors}>
+                <FormControl.Label>Altura (m)</FormControl.Label>
+                <TextInputMask
+                  placeholder="Altura (m)"
+                  value={altura}
+                  onChangeText={setAltura}
+                  keyboardType="numeric"
+                  style={inputStyle}
+                  type="only-numbers"
+                />
+                {'altura' in errors && (
+                  <FormControl.ErrorMessage leftIcon={<WarningOutlineIcon size="xs" />}>
+                    {errors.altura}
+                  </FormControl.ErrorMessage>
+                )}
+              </FormControl>
 
-              <Text fontSize="md" fontWeight="bold">Cumprimento (m)</Text>
-              <TextInputMask
-                placeholder="Cumprimento (m)"
-                value={cumprimento}
-                onChangeText={setCumprimento}
-                keyboardType="numeric"
-                style={inputStyle}
-                type="only-numbers"
-              />
+              <FormControl isInvalid={'cumprimento' in errors}>
+                <FormControl.Label>Cumprimento (m)</FormControl.Label>
+                <TextInputMask
+                  placeholder="Cumprimento (m)"
+                  value={cumprimento}
+                  onChangeText={setCumprimento}
+                  keyboardType="numeric"
+                  style={inputStyle}
+                  type="only-numbers"
+                />
+                {'cumprimento' in errors && (
+                  <FormControl.ErrorMessage leftIcon={<WarningOutlineIcon size="xs" />}>
+                    {errors.cumprimento}
+                  </FormControl.ErrorMessage>
+                )}
+              </FormControl>
             </VStack>
           </Modal.Body>
           <Modal.Footer>
-            <Button onPress={adicionarOuEditarPedido} colorScheme="purple">
-              {editando ? 'Salvar Alterações' : 'Adicionar Pedido'}
-            </Button>
+            {loading ? (
+              <Spinner />
+            ) : (
+              <>
+                <Button onPress={adicionarOuEditarPedido} colorScheme="purple" mr={2}>
+                  {editando ? 'Salvar Alterações' : 'Adicionar Pedido'}
+                </Button>
+                <Button variant="ghost" onPress={() => setShowModal(false)}>
+                  Cancelar
+                </Button>
+              </>
+            )}
           </Modal.Footer>
         </Modal.Content>
       </Modal>
