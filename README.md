@@ -1,52 +1,44 @@
-# Welcome to your Expo app 👋
+# Bem-vindo ao aplicativo de gestão de clientes e pedidos 👋
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Este é um projeto criado com [Expo](https://expo.dev) para o trabalho de extensão da Estácio. O objetivo do aplicativo é gerenciar clientes e pedidos de forma eficiente e intuitiva.
 
-## Get started
+## Como começar
 
-1. Install dependencies
+Siga os passos abaixo para configurar e executar o aplicativo:
+
+1. **Instalar as dependências**
+
+   Certifique-se de que você tenha o Node.js e o npm instalados. Depois, execute o comando abaixo na raiz do projeto para instalar as dependências necessárias:
 
    ```bash
    npm install
    ```
 
-2. Start the app
+2. **Iniciar o aplicativo**
+
+   Execute o seguinte comando para iniciar o projeto:
 
    ```bash
-    npx expo start
+   npx expo start
    ```
 
-In the output, you'll find options to open the app in a
+   No terminal, você verá opções para abrir o aplicativo em diferentes ambientes:
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+   - [Build de desenvolvimento](https://docs.expo.dev/develop/development-builds/introduction/)
+   - [Emulador Android](https://docs.expo.dev/workflow/android-studio-emulator/)
+   - [Simulador iOS](https://docs.expo.dev/workflow/ios-simulator/)
+   - [Expo Go](https://expo.dev/go), um sandbox limitado para experimentar o desenvolvimento de aplicativos com o Expo.
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+## Saiba mais
 
-## Get a fresh project
+Para aprender mais sobre o desenvolvimento de projetos com Expo, confira os recursos abaixo:
 
-When you're ready, run:
+- [Documentação do Expo](https://docs.expo.dev/): Aprenda desde os fundamentos até tópicos avançados com nossos [guias](https://docs.expo.dev/guides).
+- [Tutorial do Expo](https://docs.expo.dev/tutorial/introduction/): Siga um tutorial passo a passo para criar um projeto que roda no Android, iOS e na web.
 
-```bash
-npm run reset-project
-```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+## Sobre o projeto
 
-## Learn more
+Este aplicativo foi desenvolvido como parte de um trabalho de extensão da Estácio, com foco na gestão de clientes e pedidos. Ele busca fornecer uma interface amigável e eficiente para auxiliar negócios no gerenciamento de informações importantes.
 
-To learn more about developing your project with Expo, look at the following resources:
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
-# extensao-estacio-dev-mobile
-# extensao-estacio-dev-mobile
